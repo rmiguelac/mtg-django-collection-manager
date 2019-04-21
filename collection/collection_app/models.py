@@ -5,7 +5,7 @@ class Cards(models.Model):
 
     name = models.CharField('Card Name', max_length=128)
     edition = models.CharField('Edition', max_length=64)
-    condition = models.CharField('Condition', max_lenghh=2)
+    condition = models.CharField('Condition', max_length=2)
     quantity = models.IntegerField()
     unit_value = models.FloatField('Single card value')
     value = models.FloatField('Whole quantity value')
