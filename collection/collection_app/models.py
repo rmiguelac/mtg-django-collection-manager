@@ -12,5 +12,5 @@ class Cards(models.Model):
     location = models.CharField('Position where stored', max_length=128, blank=True)
 
     def __str__(self):
-        return f'{self.quantity}x {self.edition}\'s {self.name} in {self.condition} condition, valued in {self.value}'
+        return f'{self.name}'
 
