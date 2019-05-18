@@ -1,9 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+
 import logging
 
 from .models import Cards
 from .validator import validate
+from .pricer import CardPricer
 from .forms import AddCardForm
 
 
@@ -26,10 +28,20 @@ def add_card(request):
 
         form = AddCardForm(request.POST)
         if form.is_valid():
+
             valid_card = validate(card_name=request.POST.get('card_name'),
                                   card_set_name=request.POST.get('card_set_name'))
             logger.error(valid_card)
             if valid_card:
+
+                card = Cards(name=request.POST.get('card_name'),
+                             set=request.POST.get('card_set_name'),
+                             condition=request.POST.get('card_condition'),
+                             foil=request.POST.get('card_is_foil'),
+                             quantity=request.POST.get('card_quantity'),
+                             value=CardPricer(name=request.POST.get('card_name'), set_name=request.POST.get('card_set_name')).price)
+                card.save()
+
                 return HttpResponse("Added, i guess...")
             else:
                 return HttpResponse("Something went wrong")

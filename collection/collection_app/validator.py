@@ -1,6 +1,7 @@
 import mtgsdk
+from functools import lru_cache
 
-
+@lru_cache()
 def validate(card_name, card_set_name):
     """Validate card agains mtgsdk"""
 
