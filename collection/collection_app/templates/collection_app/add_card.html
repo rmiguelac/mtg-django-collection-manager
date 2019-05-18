@@ -1,1 +1,20 @@
-<a class="btn btn-primary" href='/add'>Add Card</a>
+<form action="/collection/manage/add" method="post">
+
+    {% csrf_token %}
+    {{ form }}
+
+    <!--
+    <label for="card_name">Card: </label>
+    <input id="card_name" type="text" name="card_name">
+    <label for="card_set_name">Set Name: </label>
+    <input id="card_set_name" type="text" name="card_set_name">
+    <label for="card_condition">Condition: </label>
+    <input id="card_condition" type="text" name="card_condition">
+    <label for="card_is_foil">Foil: </label>
+    <input id="card_is_foil" type="checkbox" name="card_is_foil">
+    <label for="card_quantity">Quantity: </label>
+    <input id="card_quantity" type="text" name="card_quantity">
+    -->
+
+    <input type="submit" value="Add">
+</form>
