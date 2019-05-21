@@ -31,7 +31,8 @@ def add_card(request):
 
             valid_card = validate(card_name=request.POST.get('card_name'),
                                   card_set_name=request.POST.get('card_set_name'))
-            logger.error(valid_card)
+            card_price = CardPricer(name=request.POST.get('card_name'),
+                                    set_name=request.POST.get('card_set_name')).price
             if valid_card:
 
                 card = Cards(name=request.POST.get('card_name'),
@@ -39,7 +40,7 @@ def add_card(request):
                              condition=request.POST.get('card_condition'),
                              foil=request.POST.get('card_is_foil'),
                              quantity=request.POST.get('card_quantity'),
-                             value=CardPricer(name=request.POST.get('card_name'), set_name=request.POST.get('card_set_name')).price)
+                             value=card_price)
                 card.save()
 
                 return HttpResponse("Added, i guess...")
