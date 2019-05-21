@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import re
 import requests
 from requests import HTTPError
 
@@ -22,11 +23,11 @@ class CardPricer:
             price_url = 'https://www.ligamagic.com.br/?view=cards/card&card='
             response = requests.get(url=f'{price_url}{self.name}')
             soup = BeautifulSoup(response.text, 'html.parser')
-            price = soup.find('div', id='precos-menor')
+            price = re.sub(',', '.', soup.find('div', id='precos-menor').string)
             if not price:
                 raise ValueError
             response.raise_for_status()
-            return float(price.text.split(' ')[1])
+            return float(price.split(' ')[1])
         except HTTPError as herr:
             print(herr)
         except ValueError as verr:
