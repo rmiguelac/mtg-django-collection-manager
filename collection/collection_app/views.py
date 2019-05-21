@@ -26,26 +26,37 @@ def add_card(request):
 
     if request.method == 'POST':
 
+        card_info = {'name': request.POST.get('card_name'),
+                     'set': request.POST.get('card_set_name'),
+                     'condition': request.POST.get('card_condition'),
+                     'foil': request.POST.get('card_is_foil'),
+                     'quantity': request.POST.get('card_quantity')}
+
         form = AddCardForm(request.POST)
+
         if form.is_valid():
 
-            valid_card = validate(card_name=request.POST.get('card_name'),
-                                  card_set_name=request.POST.get('card_set_name'))
-            card_price = CardPricer(name=request.POST.get('card_name'),
-                                    set_name=request.POST.get('card_set_name')).price
-            if valid_card:
+            card = Cards.objects.filter(name=card_info['name']).filter(set=card_info['set']).filter(condition=card_info['condition'])
 
-                card = Cards(name=request.POST.get('card_name'),
-                             set=request.POST.get('card_set_name'),
-                             condition=request.POST.get('card_condition'),
-                             foil=request.POST.get('card_is_foil'),
-                             quantity=request.POST.get('card_quantity'),
-                             value=card_price)
-                card.save()
+            if not card:
+                card_exists = validate(card_name=card_info['name'], card_set_name=card_info['set'])
 
-                return HttpResponse("Added, i guess...")
+                if card_exists:
+
+                    card_price = CardPricer(name=card_info['name'], set_name=card_info['set']).price
+
+                    c = Cards(name=card_info['name'], set=card_info['set'], condition=card_info['condition'],
+                                 foil=card_info['foil'], quantity=card_info['quantity'], value=card_price)
+                    c.save()
+
+                    return HttpResponse(f"{card_info['name']} added to you collection!")
+                else:
+                    return HttpResponse(f"Card {card_info['name']} does not seem to exist!")
+
             else:
-                return HttpResponse("Something went wrong")
+                already_have_quantity = int(card.values()[0].get('quantity'))
+                card.update(quantity=already_have_quantity + int(card_info['quantity']))
+
 
     else:
         form = AddCardForm()
