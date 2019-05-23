@@ -58,6 +58,7 @@ def add_card(request):
                 already_have_quantity = int(card.values()[0].get('quantity'))
                 card.update(quantity=already_have_quantity + int(card_info['quantity']))
                 card.update(value=card_price)
+                return HttpResponse(f"{card_info['name']} updated on your collection")
 
 
     else:
