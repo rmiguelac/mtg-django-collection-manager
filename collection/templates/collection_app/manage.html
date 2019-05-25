@@ -1,5 +1,11 @@
+{% load staticfiles %}
+
 <ul>
     <li><a class="btn btn-primary" href='/collection'>Show collection</a></li>
-    <li><a class="btn btn-primary" href='add'>Add Card</a></li>
+    <li>
+        <a class="btn btn-primary" href='add'>
+            <img class="btn btn-primary" src="{% static 'collection_app/images/add_card.png' %}" alt='Add Card' href='add' />
+        </a>
+    </li>
     <li><a class="btn btn-primary" href='remove'>Remove Card</a></li>
 </ul>
