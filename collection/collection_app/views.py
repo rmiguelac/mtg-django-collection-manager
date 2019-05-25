@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 def collection(request):
     cards = Cards.objects.all()
     context = {'cards': cards,}
-    return render(request, 'collection_app/collection.html', context)
+    return render(request, 'collection.html', context)
 
 
 def manage(request):
-    return render(request, 'collection_app/manage.html')
+    return render(request, 'manage.html')
 
 
 def add_card(request):
@@ -68,4 +68,4 @@ def add_card(request):
 
 
 def remove_card(request):
-    return render(request, 'collection_app/remove_card.html')
+    return render(request, 'remove_card.html')
