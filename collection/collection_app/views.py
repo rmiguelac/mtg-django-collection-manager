@@ -54,8 +54,11 @@ def add_card(request):
                     return HttpResponse(f"Card {card_info['name']} does not seem to exist!")
 
             else:
+                card_price = CardPricer(name=card_info['name'], set_name=card_info['set']).price
                 already_have_quantity = int(card.values()[0].get('quantity'))
                 card.update(quantity=already_have_quantity + int(card_info['quantity']))
+                card.update(value=card_price)
+                return HttpResponse(f"{card_info['name']} updated on your collection")
 
 
     else:
