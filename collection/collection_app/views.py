@@ -5,7 +5,7 @@ import logging
 
 from .models import Cards
 from .validator import validate
-from .pricer import CardPricer
+from collection.scrapper.pricer import CardPricer
 from .forms import AddCardForm
 
 
