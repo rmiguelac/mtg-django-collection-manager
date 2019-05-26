@@ -1,12 +1,11 @@
+import logging
+
 from django.http import HttpResponse
 from django.shortcuts import render
 
-import logging
-
-from .models import Cards
-from .validator import validate
-from collection.scrapper.pricer import CardPricer
-from .forms import AddCardForm
+from collection.collection_app.models import Cards
+from collection.collection_app.validator import validate
+from collection.collection_app.forms import AddCardForm
 
 
 logger = logging.getLogger(__name__)
@@ -43,10 +42,8 @@ def add_card(request):
 
                 if card_exists:
 
-                    card_price = CardPricer(name=card_info['name'], set_name=card_info['set']).price
-
                     c = Cards(name=card_info['name'], set=card_info['set'], condition=card_info['condition'],
-                                 foil=card_info['foil'], quantity=card_info['quantity'], value=card_price)
+                                 foil=card_info['foil'], quantity=card_info['quantity'], value=0)
                     c.save()
 
                     return HttpResponse(f"{card_info['name']} added to you collection!")
@@ -54,13 +51,9 @@ def add_card(request):
                     return HttpResponse(f"Card {card_info['name']} does not seem to exist!")
 
             else:
-                card_price = CardPricer(name=card_info['name'], set_name=card_info['set']).price
                 already_have_quantity = int(card.values()[0].get('quantity'))
                 card.update(quantity=already_have_quantity + int(card_info['quantity']))
-                card.update(value=card_price)
                 return HttpResponse(f"{card_info['name']} updated on your collection")
-
-
     else:
         form = AddCardForm()
 
