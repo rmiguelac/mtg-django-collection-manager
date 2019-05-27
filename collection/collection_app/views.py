@@ -26,11 +26,11 @@ def add_card(request):
     if request.method == 'POST':
         form = AddCardForm(request.POST)
         if form.is_valid():
-            info = {'name': request.POST.get('card_name'),
-                    'set': request.POST.get('card_set_name'),
-                    'condition': request.POST.get('card_condition'),
-                    'foil': request.POST.get('card_is_foil'),
-                    'quantity': request.POST.get('card_quantity')}
+            info = {'name': request.POST.get('name'),
+                    'set': request.POST.get('set_name'),
+                    'condition': request.POST.get('condition'),
+                    'foil': request.POST.get('is_foil'),
+                    'quantity': request.POST.get('quantity')}
             card_is_valid = Card(name=info['name'])
             if card_is_valid:
                 card_is_in_db = Cards.objects.filter(
@@ -39,6 +39,8 @@ def add_card(request):
                     set=info['set']
                 ).filter(
                     condition=info['condition']
+                ).filter(
+                    foil=info['foil']
                 )
                 card = card_is_in_db
                 if card_is_in_db:
