@@ -46,7 +46,7 @@ class Card:
         :param kwags: might receive name, set_name, condition and foil
         :return: Card cls object if valid object, raise ValueError otherwise
         """
-        if not cls._get_existance(*args, **kwags):
+        if not cls._get_existence(*args, **kwags):
             raise ValueError('Unable to instantiate Card(name="swa") as it is not a valid card')
         else:
             return super(Card, cls).__new__(cls)
