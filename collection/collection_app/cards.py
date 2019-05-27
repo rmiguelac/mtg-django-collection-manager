@@ -26,14 +26,14 @@ def get_card(name):
         response = requests.get(url=f'{REQUEST["API"]}{REQUEST["CARDS_ENDPOINT"]}?exact={name}')
         response.raise_for_status()
         return response.json()
-    except requests.HTTPError:
-        logger.error(f'Card "{name}" not found. trying fuzzy match...')
+    except requests.HTTPError as err:
+        logger.error(f'Card "{name}" not found. trying fuzzy match...{err}')
         try:
             response = requests.get(url=f'{REQUEST["API"]}{REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
             response.raise_for_status()
             return response.json()
-        except requests.HTTPError:
-            logger.error(f'Card "{name}" not found...')
+        except requests.HTTPError as err:
+            logger.error(f'Card "{name}" not found...{err}')
             return False
 
 
@@ -79,7 +79,7 @@ class Card:
             return get_card(name=self.name)['prices']['usd']
 
     @classmethod
-    def _get_existance(cls, name):
+    def _get_existence(cls, name):
         return get_card(name=name)
 
     def __repr__(self):
