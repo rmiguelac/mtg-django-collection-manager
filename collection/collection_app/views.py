@@ -3,9 +3,9 @@ import logging
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from collection.collection_app.models import Cards
-from collection.collection_app.validator import validate
-from collection.collection_app.forms import AddCardForm
+from .models import Cards
+from .cards import Card
+from .forms import AddCardForm
 
 
 logger = logging.getLogger(__name__)
@@ -24,36 +24,35 @@ def manage(request):
 def add_card(request):
 
     if request.method == 'POST':
-
-        card_info = {'name': request.POST.get('card_name'),
-                     'set': request.POST.get('card_set_name'),
-                     'condition': request.POST.get('card_condition'),
-                     'foil': request.POST.get('card_is_foil'),
-                     'quantity': request.POST.get('card_quantity')}
-
         form = AddCardForm(request.POST)
-
         if form.is_valid():
-
-            card = Cards.objects.filter(name=card_info['name']).filter(set=card_info['set']).filter(condition=card_info['condition'])
-
-            if not card:
-                card_exists = validate(card_name=card_info['name'], card_set_name=card_info['set'])
-
-                if card_exists:
-
-                    c = Cards(name=card_info['name'], set=card_info['set'], condition=card_info['condition'],
-                                 foil=card_info['foil'], quantity=card_info['quantity'], value=0)
-                    c.save()
-
-                    return HttpResponse(f"{card_info['name']} added to you collection!")
+            info = {'name': request.POST.get('card_name'),
+                    'set': request.POST.get('card_set_name'),
+                    'condition': request.POST.get('card_condition'),
+                    'foil': request.POST.get('card_is_foil'),
+                    'quantity': request.POST.get('card_quantity')}
+            card_is_valid = Card(name=info['name'])
+            if card_is_valid:
+                card_is_in_db = Cards.objects.filter(
+                    name=info['name']
+                ).filter(
+                    set=info['set']
+                ).filter(
+                    condition=info['condition']
+                )
+                card = card_is_in_db
+                if card_is_in_db:
+                    already_have_quantity = int(card.values()[0].get('quantity'))
+                    card.update(quantity=already_have_quantity + int(info['quantity']))
+                    return HttpResponse(f"{info['name']} updated on your collection")
                 else:
-                    return HttpResponse(f"Card {card_info['name']} does not seem to exist!")
-
+                    c = Cards(name=info['name'], set=info['set'], condition=info['condition'],
+                              foil=info['foil'], quantity=info['quantity'], value=0)
+                    c.save()
+                    return HttpResponse(f"{info['name']} added to you collection!")
             else:
-                already_have_quantity = int(card.values()[0].get('quantity'))
-                card.update(quantity=already_have_quantity + int(card_info['quantity']))
-                return HttpResponse(f"{card_info['name']} updated on your collection")
+                pass
+
     else:
         form = AddCardForm()
 
