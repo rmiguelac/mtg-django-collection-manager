@@ -26,12 +26,13 @@ def add_card(request):
     if request.method == 'POST':
         form = AddCardForm(request.POST)
         if form.is_valid():
-            info = {'name': request.POST.get('name'),
-                    'set': request.POST.get('set_name'),
-                    'condition': request.POST.get('condition'),
-                    'foil': request.POST.get('is_foil'),
-                    'quantity': request.POST.get('quantity')}
+            info = {'name': form.cleaned_data['name'],
+                    'set': form.cleaned_data['set_name'],
+                    'condition': form.cleaned_data['condition'],
+                    'foil': form.cleaned_data['is_foil'],
+                    'quantity': form.cleaned_data['quantity']}
             card_is_valid = Card(name=info['name'])
+            info['price'] = card_is_valid.price
             if card_is_valid:
                 card_is_in_db = Cards.objects.filter(
                     name=info['name']
@@ -49,7 +50,7 @@ def add_card(request):
                     return HttpResponse(f"{info['name']} updated on your collection")
                 else:
                     c = Cards(name=info['name'], set=info['set'], condition=info['condition'],
-                              foil=info['foil'], quantity=info['quantity'], value=0)
+                              foil=info['foil'], quantity=info['quantity'], value=info['price'])
                     c.save()
                     return HttpResponse(f"{info['name']} added to you collection!")
             else:
