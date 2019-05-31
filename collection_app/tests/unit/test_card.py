@@ -5,12 +5,12 @@ from collection_app.cards import Card
 
 class TestCard:
 
-    def test_card_existence_failure(self):
+    def test_card_instantiation_failure(self):
         with pytest.raises(ValueError) as excp_info:
             Card(name='Blip blop')
         assert 'Unable to instantiate' in str(excp_info.value)
 
-    def test_card_existence_success(self):
+    def test_card_instantiation_success(self):
         card = Card(name='Mox Opal')
         assert isinstance(card, Card)
 
