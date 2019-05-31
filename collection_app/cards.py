@@ -25,31 +25,34 @@ def get_card(name):
     try:
         response = requests.get(url=f'{REQUEST["API"]}{REQUEST["CARDS_ENDPOINT"]}?exact={name}')
         response.raise_for_status()
+        print(response.text)
+        print(response.status_code)
         return response.json()
     except requests.HTTPError as err:
-        logger.error(f'Card "{name}" not found. trying fuzzy match...{err}')
+        logger.debug(f'Card "{name}" not found. trying fuzzy match. Response: {err}')
         try:
             response = requests.get(url=f'{REQUEST["API"]}{REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
             response.raise_for_status()
             return response.json()
         except requests.HTTPError as err:
-            logger.error(f'Card "{name}" not found...{err}')
-            return False
+            logger.debug(f'Card "{name}" not found. Response: {err}')
+            raise ValueError
 
 
 class Card:
 
-    def __new__(cls, *args, **kwags):
+    def __new__(cls, *args, **kwargs):
         """
         Guarantee that the object being instantiated exists
         :param args: might receive name, set_name, condition and foil
-        :param kwags: might receive name, set_name, condition and foil
+        :param kwargs: might receive name, set_name, condition and foil
         :return: Card cls object if valid object, raise ValueError otherwise
         """
-        if not cls._get_existence(*args, **kwags):
-            raise ValueError('Unable to instantiate Card(name="swa") as it is not a valid card')
-        else:
+        try:
+            cls._get_existence(*args, **kwargs)
             return super(Card, cls).__new__(cls)
+        except ValueError:
+            raise ValueError(f'Unable to instantiate Card with current value as it is not a valid card')
 
     def __init__(self, name, set_name=None, condition=None, foil=None):
         """
