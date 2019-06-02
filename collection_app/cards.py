@@ -107,6 +107,3 @@ class Card:
     def __str__(self):
         return f'{__class__.__name__}(name={self.name}, set_name={self.set_name}, condition={self.condition}, foil={self.foil})'
 
-
-c = Card(name='Mox Opal', external_api=ScryfallAPI()).price
-print(c)
