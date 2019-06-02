@@ -22,7 +22,7 @@ class ScryfallAPI:
         """
         Using external HTTPS API, get card information
 
-        While the first try to get card info uses the /exact endpoint and may be more exact,
+        While the first try attempts to get card info uses the /exact endpoint and is more exact,
         the fuzzy method might help when providing miss-spelled cards.
 
         :param name: card name
@@ -55,11 +55,10 @@ class Card:
         :return: Card cls object if valid object, raise ValueError otherwise
         """
         try:
-            ext_api = kwargs['external_api']
-            ext_api.get_card(name=kwargs['name'])
+            kwargs['external_api'].get_card(name=kwargs['name'])
             return super(Card, cls).__new__(cls)
         except ValueError:
-            raise ValueError(f'Unable to instantiate Card with current value as it is not a valid card')
+            raise ValueError('Unable to instantiate Card with current value as it is not a valid card')
 
     def __init__(self, name, set_name=None, condition=None, foil=None, external_api=None):
         """
@@ -106,4 +105,3 @@ class Card:
 
     def __str__(self):
         return f'{__class__.__name__}(name={self.name}, set_name={self.set_name}, condition={self.condition}, foil={self.foil})'
-
