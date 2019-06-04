@@ -3,7 +3,7 @@ from django.db import models
 
 class Cards(models.Model):
 
-    name = models.CharField('Card Name', max_length=128)
+    name = models.CharField('Card Name', max_length=128, primary_key=True, db_index=True)
     set = models.CharField('Set', max_length=64, blank=True)
     condition = models.CharField('Condition', max_length=2, blank=True)
     foil = models.BooleanField('Foil', default=False, null=True)
