@@ -1,5 +1,5 @@
 import pytest
-from mock import Mock
+from mock import Mock, patch
 
 from collection_app.cards import Card, ScryfallAPI
 
@@ -17,13 +17,12 @@ def mock_external_api():
 
 class TestCard:
 
-    #def test_card_instantiation_failure(self, mock_external_api):
+    def test_card_instantiation_failure(self):
 
-    #    with pytest.raises(ValueError) as excp_info:
-    #        Card(name='Mox Opal', external_api=mock_external_api)
-    #        mock_external_api.get_card.return_value = \
-    #            ValueError('Unable to instantiate Card with current value as it is not a valid card')
-    #    assert 'Unable to instantiate' in str(excp_info.value)
+        with patch('collection_app.cards.ScryfallAPI.get_card', side_effect=ValueError('Unable')):
+            with pytest.raises(ValueError) as excp_info:
+                Card(name='Not-a-real-card', external_api=ScryfallAPI)
+            assert 'Unable to instantiate' in str(excp_info.value)
 
     def test_card_instantiation_success(self, mock_external_api):
         card = Card(name='Mox Opal', external_api=mock_external_api)
