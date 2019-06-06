@@ -3,9 +3,9 @@ import logging
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .models import Cards
-from .cards import Card
-from .forms import AddCardForm
+from collection_app.models import Cards
+from collection_app.cards import Card
+from collection_app.forms import AddCardForm
 
 
 logger = logging.getLogger(__name__)
