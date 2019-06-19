@@ -15,35 +15,21 @@ class CardAPI:
     """
     __metaclass__ = abc.ABCMeta
 
-    @abc.abstractmethod
-    def __init__(self, name):
-        self.name = name
-        self._value = None
-
     @classmethod
     @abc.abstractmethod
-    def get_card(cls, name):
+    def _get_card(cls, name):
         """
         Get all card information into a class object
         This class object should then be read and/or returned when requested.
         """
 
-    @property
+    @classmethod
     @abc.abstractmethod
-    def value(self):
+    def get_card_values(cls, name):
         """
-        Return a dict with both foil and non-foil price
+        Get card value information
+        This class object should then be read and/or returned when requested.
         """
-
-    @value.setter
-    @abc.abstractmethod
-    def value(self, new_value):
-        pass
-
-    @value.getter
-    @abc.abstractmethod
-    def value(self):
-        pass
 
 
 class ScryfallAPI(CardAPI):
@@ -57,13 +43,11 @@ class ScryfallAPI(CardAPI):
         'HEADER_CONTENT': {'Content-Type': 'application/json'},
     }
 
-    def __init__(self, name):
-        super().__init__(self)
-        self.name = name
-        self._value = None
+    def __init__(self):
+        super().__init__()
 
     @classmethod
-    def get_card(cls, name):
+    def _get_card(cls, name) -> dict:
         """
         Using external HTTPS API, get card information
 
@@ -88,16 +72,8 @@ class ScryfallAPI(CardAPI):
                 logger.debug(f'Card "{name}" not found. Response: {err}')
                 raise ValueError
 
-    @property
-    def value(self):
-        return self._value
+    @classmethod
+    def get_card_values(cls, name):
+        prices = cls._get_card(name=name)['prices']
+        return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
 
-    @value.getter
-    def value(self):
-        prices = self.get_card(name=self.name)['prices']
-        self.value = dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
-        return self._value
-
-    @value.setter
-    def value(self, new_value):
-        self._value = new_value
