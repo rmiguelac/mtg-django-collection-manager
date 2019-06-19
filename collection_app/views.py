@@ -3,9 +3,9 @@ import logging
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from .models import Cards
-from .cards import Card
-from .forms import AddCardForm
+from collection_app.models import Cards
+from collection_app.cards import Card
+from collection_app.forms import AddCardForm
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ def add_card(request):
                     'foil': form.cleaned_data['is_foil'],
                     'quantity': form.cleaned_data['quantity']}
             card_is_valid = Card(name=info['name'])
-            info['price'] = card_is_valid.price
+            info['price'] = card_is_valid.value
             if card_is_valid:
                 card_is_in_db = Cards.objects.filter(
                     name=info['name']
@@ -53,8 +53,6 @@ def add_card(request):
                               foil=info['foil'], quantity=info['quantity'], value=info['price'])
                     c.save()
                     return HttpResponse(f"{info['name']} added to you collection!")
-            else:
-                pass
 
     else:
         form = AddCardForm()
