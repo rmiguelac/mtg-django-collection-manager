@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, MagicMock, patch, PropertyMock, create_autospec
+from unittest.mock import MagicMock
 
 from collection_app.cards import Card
 from collection_app.cards_api import ScryfallAPI
