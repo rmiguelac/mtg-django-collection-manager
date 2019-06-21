@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Cards(models.Model):
+class Card(models.Model):
 
     name = models.CharField('Card Name', max_length=128, primary_key=True, db_index=True)
     set = models.CharField('Set', max_length=64, blank=True)
