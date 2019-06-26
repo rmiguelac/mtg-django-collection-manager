@@ -1,3 +1,4 @@
+from requests import HTTPError
 
 
 class Card:
@@ -17,21 +18,21 @@ class Card:
         self.condition = condition
         self.foil = foil
         self._value = None
+        self._is_valid = False
         self._card_api = card_api
 
     @property
-    def value(self):
+    def value(self) -> float:
         """
         Card value in USD
 
         :return: return float object which represents the card price
         """
-        return float(self.value)
+        return self.value
 
     @value.getter
-    def value(self):
+    def value(self) -> float:
         price = self._card_api.get_card_values(name=self.name)
-        print(type(price))
 
         if self.foil:
             self.value = price['foil']
@@ -41,5 +42,29 @@ class Card:
             return float(self._value)
 
     @value.setter
-    def value(self, new_value):
+    def value(self, new_value) -> None:
         self._value = new_value
+
+    @property
+    def is_valid(self) -> bool:
+        """
+        Check card existence against external API
+
+        :return: True if able to find it in external API, False otherwise
+        """
+        return self.is_valid
+
+    @is_valid.getter
+    def is_valid(self) -> bool:
+
+        try:
+            self._card_api.get_card_values(name=self.name)
+            self.is_valid = True
+            return self._is_valid
+        except HTTPError:
+            self.is_valid = False
+            return self._is_valid
+
+    @is_valid.setter
+    def is_valid(self, new_value) -> None:
+        self._is_valid = new_value

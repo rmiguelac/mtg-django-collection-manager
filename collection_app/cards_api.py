@@ -64,10 +64,9 @@ class ScryfallAPI(CardAPI):
                 response.raise_for_status()
                 return response.json()
             except requests.HTTPError as err:
-                raise ValueError
+                raise err
 
     @classmethod
     def get_card_values(cls, name):
         prices = cls._get_card(name=name)['prices']
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
-
