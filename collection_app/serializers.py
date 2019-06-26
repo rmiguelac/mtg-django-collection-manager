@@ -11,6 +11,20 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         read_only_fields = ('value',)
 
+    def validate_name(self, value):
+        """
+        Custom validator on name field
+        If name is not validated against external API, return exception
+
+        :param value: Card name
+        :return: value in case validated, exception otherwise
+        """
+
+        card = CardScryfallImpl(name=value)
+        if card.is_valid:
+            return value
+        return serializers.ValidationError('There is no such Card {name}'.format(name=value))
+
     def create(self, validated_data):
         """
         Create and return new 'Card' instance, given the validated data
