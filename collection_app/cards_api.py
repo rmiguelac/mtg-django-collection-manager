@@ -1,10 +1,6 @@
-import logging
 import abc
 
 import requests
-
-
-logger = logging.getLogger(__name__)
 
 
 class CardAPI:
@@ -63,13 +59,11 @@ class ScryfallAPI(CardAPI):
             response.raise_for_status()
             return response.json()
         except requests.HTTPError as err:
-            logger.debug(f'Card "{name}" not found. trying fuzzy match. Response: {err}')
             try:
                 response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
                 response.raise_for_status()
                 return response.json()
             except requests.HTTPError as err:
-                logger.debug(f'Card "{name}" not found. Response: {err}')
                 raise ValueError
 
     @classmethod

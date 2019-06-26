@@ -1,25 +1,19 @@
-import logging
-
-from collection_app.cards_api import ScryfallAPI
-
-
-logger = logging.getLogger(__name__)
 
 
 class Card:
 
-    def __init__(self, name, set_name=None, condition=None, foil=None, card_api=None):
+    def __init__(self, name, expansion=None, condition=None, foil=None, card_api=None):
         """
         A class to be used as validator and information fetcher
 
         :param name: Card name
-        :param set_name: Set in which card was printed
+        :param expansion: Set in which card was printed
         :param condition: One of NM, SP, MP, HP, D
         :param foil: bool with either True or False
         :param card_api: class to provide information about the card. Use of dependency injection
         """
         self.name = name
-        self.set_name = set_name
+        self.expansion = expansion
         self.condition = condition
         self.foil = foil
         self._value = None
