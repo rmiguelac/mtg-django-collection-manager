@@ -3,6 +3,7 @@ from requests import HTTPError
 import collection_app.cards_api as ext_apis
 
 
+
 class Card:
 
     def __init__(self, name, expansion=None, condition=None, foil=None, card_api=None):
@@ -74,5 +75,5 @@ class Card:
 
 class CardScryfallImpl(Card):
 
-    def __init__(self, name, expansion, condition, foil, card_api=ext_apis.ScryfallAPI):
+    def __init__(self, name, expansion=None, condition=None, foil=False, card_api=ext_apis.ScryfallAPI):
         super().__init__(name, expansion, condition, foil, card_api=card_api)
