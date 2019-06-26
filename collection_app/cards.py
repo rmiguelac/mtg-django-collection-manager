@@ -1,5 +1,7 @@
 from requests import HTTPError
 
+import collection_app.cards_api as ext_apis
+
 
 class Card:
 
@@ -68,3 +70,9 @@ class Card:
     @is_valid.setter
     def is_valid(self, new_value) -> None:
         self._is_valid = new_value
+
+
+class CardScryfallImpl(Card):
+
+    def __init__(self, name, expansion, condition, foil, card_api=ext_apis.ScryfallAPI):
+        super().__init__(name, expansion, condition, foil, card_api=card_api)
