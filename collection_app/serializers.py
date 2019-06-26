@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
 from collection_app.models import Card
-from collection_app.cards import Card as CardImpl
-from collection_app.cards_api import ScryfallAPI
+from collection_app.cards import CardScryfallImpl
 
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
@@ -10,6 +9,7 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Card
         fields = '__all__'
+        read_only_fields = ('value',)
 
     def create(self, validated_data):
         """
@@ -20,10 +20,10 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
             'expansion': validated_data['expansion'],
             'condition': validated_data['condition'],
             'foil': validated_data['foil'],
-            'card_api': ScryfallAPI
         }
 
-        validated_data['value'] = CardImpl(**args).value
+        card = CardScryfallImpl(**args)
+        validated_data['value'] = card.value
 
         return Card.objects.create(**validated_data)
 
