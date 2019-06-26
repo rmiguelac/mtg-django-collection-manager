@@ -8,5 +8,5 @@ class CardViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows cards to viewed or edited
     """
-    queryset = Card.objects.all().order_by('value')
+    queryset = Card.objects.all().order_by('-value')
     serializer_class = CardSerializer
