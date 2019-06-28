@@ -1,7 +1,8 @@
 from django.urls import path
-from collection_app import views
+
+app_name = 'collection_app'
 
 urlpatterns = [
-    path('cards/', views.collection_list),
-    path('cards/<int:pk>/', views.collection_detail),
+    path('cards/', name='card-list'),
+    path('cards/{pk}/', name='card-details'),
 ]
