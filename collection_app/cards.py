@@ -96,7 +96,3 @@ class CardScryfallImpl(Card):
 
     def __init__(self, name, expansion=None, condition=None, foil=False, card_api=ext_apis.ScryfallAPI):
         super().__init__(name, expansion, condition, foil, card_api=card_api)
-
-
-x = CardScryfallImpl(name='Mox Opal')
-print(x.sets)
