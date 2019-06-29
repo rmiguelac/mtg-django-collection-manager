@@ -1,10 +1,18 @@
 import pytest
 
 from django.contrib.auth.models import User
-
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
+
+"""
+
+TODO: Mock the external API - Scryfall
+
+The validators under the serializerrs use them and should not consume it directly on 
+the tests.
+
+"""
 
 
 class TestCollection(APITestCase):
@@ -43,9 +51,12 @@ class TestCollection(APITestCase):
         response = self.client.post(url, self.PAYLOAD, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    #@pytest.mark.django_db
-    #def test_post_invalid_expansion_card(self, factory):
-    #    pass
+    @pytest.mark.django_db
+    def test_post_invalid_expansion_card(self):
+        url = reverse('card-list')
+        self.PAYLOAD['expansion'] = 'Wrong Set Name'
+        response = self.client.post(url, self.PAYLOAD, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     #@pytest.mark.django_db
     #def test_post_unique_constraint(self, factory):

@@ -30,6 +30,11 @@ class CardAPI:
 
 class ScryfallAPI(CardAPI):
 
+    """
+    Implementation of abstract CardAPI class using ScryfallAPI external API
+    Several limitation on the request must be followed. Delay for example.
+    """
+
     REQUEST = {
         'API': 'https://api.scryfall.com',
         'CARDS_ENDPOINT': '/cards/named',
@@ -67,6 +72,13 @@ class ScryfallAPI(CardAPI):
                 raise err
 
     @classmethod
-    def get_card_values(cls, name):
+    def get_card_values(cls, name) -> dict:
+        """
+        With all card information from self._ged_card, get the prices vallues and return them
+        separated in foil and non-foil
+
+        :param name: card name
+        :return: dict with foil and non-foil keys
+        """
         prices = cls._get_card(name=name)['prices']
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})

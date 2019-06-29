@@ -26,6 +26,18 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
             return value
         raise serializers.ValidationError('There is no such Card {name}'.format(name=value))
 
+    @staticmethod
+    def validate_expansion(value):
+        """
+        Custom validator on expansion field
+        If expansion is not valid against external API, return exception
+
+        :param value: Card expansion (set)
+        :return: value
+        """
+
+        pass
+
     def create(self, validated_data):
         """
         Create and return new 'Card' instance, given the validated data
