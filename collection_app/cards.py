@@ -20,8 +20,28 @@ class Card:
         self.condition = condition
         self.foil = foil
         self._value = None
+        self._sets = None
         self._is_valid = False
         self._card_api = card_api
+
+    @property
+    def sets(self) -> list:
+        """
+        Sets/Expansions in which the card have been printed
+        :return: list with all given sets in english
+        """
+
+        return self.sets
+
+    @sets.setter
+    def sets(self, new_value) -> None:
+        self._sets = new_value
+
+    @sets.getter
+    def sets(self) -> list:
+        sets = self._card_api.get_card_sets(name=self.name)
+        self.sets = sets
+        return sets
 
     @property
     def value(self) -> float:
@@ -76,3 +96,7 @@ class CardScryfallImpl(Card):
 
     def __init__(self, name, expansion=None, condition=None, foil=False, card_api=ext_apis.ScryfallAPI):
         super().__init__(name, expansion, condition, foil, card_api=card_api)
+
+
+x = CardScryfallImpl(name='Mox Opal')
+print(x.sets)

@@ -11,32 +11,22 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         read_only_fields = ('value',)
 
-    @staticmethod
-    def validate_name(value):
+    def validate(self, data):
         """
-        Custom validator on name field
-        If name is not validated against external API, return exception
+        Custom validator on whole request data
+        If data is not valid against external API, return exception
 
-        :param value: Card name
-        :return: value in case validated, exception otherwise
-        """
-
-        card = CardScryfallImpl(name=value)
-        if card.is_valid:
-            return value
-        raise serializers.ValidationError('There is no such Card {name}'.format(name=value))
-
-    @staticmethod
-    def validate_expansion(value):
-        """
-        Custom validator on expansion field
-        If expansion is not valid against external API, return exception
-
-        :param value: Card expansion (set)
+        :param data: dict with whole Card model fields
         :return: value
         """
 
-        pass
+        card = CardScryfallImpl(name=data['name'])
+        if card:
+            if card.is_valid and data['expansion'] in card.sets:
+                return data
+        raise serializers.ValidationError(
+            'There is no such card {card} in {exp} set'.format(card=data['name'], exp=data['expansion'])
+        )
 
     def create(self, validated_data):
         """

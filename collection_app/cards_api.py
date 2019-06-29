@@ -1,4 +1,5 @@
 import abc
+from functools import lru_cache
 
 import requests
 
@@ -13,7 +14,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def _get_card(cls, name):
+    def _get_card(cls, name) -> dict:
         """
         Get all card information into a class object
         This class object should then be read and/or returned when requested.
@@ -21,10 +22,16 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_values(cls, name):
+    def get_card_values(cls, name) -> dict:
         """
         Get card value information
         This class object should then be read and/or returned when requested.
+        """
+
+    @classmethod
+    def get_card_sets(cls, name) -> list:
+        """
+        Get all sets in which the card has been printed
         """
 
 
@@ -48,6 +55,7 @@ class ScryfallAPI(CardAPI):
         super().__init__()
 
     @classmethod
+    @lru_cache(maxsize=10000)
     def _get_card(cls, name) -> dict:
         """
         Using external HTTPS API, get card information
@@ -82,3 +90,21 @@ class ScryfallAPI(CardAPI):
         """
         prices = cls._get_card(name=name)['prices']
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
+
+    @classmethod
+    def get_card_sets(cls, name) -> list:
+        """
+        Get all sets in which the card has been printed using external Scryfall API
+
+        :param name: :string: card name
+        :return: :list: all sets in which the card has been printed
+        """
+
+        uri = cls._get_card(name=name)['prints_search_uri']
+
+        try:
+            response = requests.get(url=uri)
+            response.raise_for_status()
+            return [x['set_name'] for x in response.json()['data']]
+        except requests.HTTPError as err:
+            raise err
