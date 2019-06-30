@@ -51,7 +51,7 @@ class ScryfallAPI(CardAPI):
     """
 
     REQUEST = {
-        'API': 'hts://api.scryfall.com',
+        'API': 'https://api.scryfall.com',
         'CARDS_ENDPOINT': '/cards/named',
         'DELAY': 0.1,
         'ENCODING': 'utf-8',

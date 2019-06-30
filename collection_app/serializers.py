@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from collection_app.models import Card
 from collection_app.cards import CardScryfallImpl
@@ -21,6 +22,7 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         """
 
         card = CardScryfallImpl(name=data['name'])
+
         if card.is_valid and data['expansion'] in card.sets:
             data['value'] = card.value
             return data
@@ -45,10 +47,3 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         instance.quantity = validated_data.get('quantity', instance.quantity)
         instance.save()
         return instance
-
-    """
-    
-    On adding a card, if unique is not violated, add it
-    If unique already exists, update the card quantity and value    
-    
-    """

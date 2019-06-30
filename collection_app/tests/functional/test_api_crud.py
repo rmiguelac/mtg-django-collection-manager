@@ -1,4 +1,8 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 from django.contrib.auth.models import User
 import pytest
@@ -25,8 +29,8 @@ class TestCollection(APITestCase):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
             with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
                 url = reverse('card-list')
-                data = constants.GOOD_PAYLOAD
-                response = self.client.post(url, data, format='json')
+                payload = constants.GOOD_PAYLOAD.copy()
+                response = self.client.post(url, payload, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -36,27 +40,33 @@ class TestCollection(APITestCase):
             with patch('collection_app.cards_api.ScryfallAPI.validate', return_value=False):
                 with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
                     url = reverse('card-list')
-                    data = constants.GOOD_PAYLOAD
-                    data['name'] = 'Mx Pl'
-                    response = self.client.post(url, data, format='json')
+                    payload = constants.GOOD_PAYLOAD.copy()
+                    payload['name'] = 'Mx Pl'
+                    response = self.client.post(url, payload, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     @pytest.mark.django_db
     def test_post_invalid_expansion_card(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', side_effect=constants.GOOD_RESPONSE):
-            with patch('collection_app.cards_api.ScryfallAPI.validate', return_value=True):
-                with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
-                    url = reverse('card-list')
-                    data = constants.GOOD_PAYLOAD
-                    data['expansion'] = 'Wrong Set Name'
-                    response = self.client.post(url, data, format='json')
+            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
+                url = reverse('card-list')
+                payload = constants.GOOD_PAYLOAD.copy()
+                payload['expansion'] = 'Wrong Set Name'
+                response = self.client.post(url, payload, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    #@pytest.mark.django_db
-    #def test_post_unique_constraint(self, factory):
-    #    pass
+    @pytest.mark.django_db
+    def test_post_unique_constraint_status_code(self):
+        with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
+            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
+                url = reverse('card-list')
+                payload = constants.GOOD_PAYLOAD.copy()
+                self.client.post(url, payload, format='json')
+                second_post_response = self.client.post(url, payload, format='json')
+
+        self.assertEqual(second_post_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     ## UPDATE methods
     #@pytest.mark.django_db
@@ -89,3 +99,4 @@ class TestCollection(APITestCase):
     #@pytest.mark.django_db
     #def test_valid_delete(self, factory):
     #    pass
+
