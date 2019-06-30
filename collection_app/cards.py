@@ -78,14 +78,13 @@ class Card:
 
     @is_valid.getter
     def is_valid(self) -> bool:
+        """
+        Validate card existence given its name using external API
+        :return: bool -> either True or False
+        """
 
-        try:
-            self._card_api.get_card_values(name=self.name)
-            self.is_valid = True
-            return self._is_valid
-        except HTTPError:
-            self.is_valid = False
-            return self._is_valid
+        self.is_valid = self._card_api.validate(name=self.name)
+        return self._is_valid
 
     @is_valid.setter
     def is_valid(self, new_value) -> None:

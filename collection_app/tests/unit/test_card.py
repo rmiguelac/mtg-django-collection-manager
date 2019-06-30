@@ -5,20 +5,15 @@ from requests import HTTPError
 
 from collection_app.cards import Card
 from collection_app.cards_api import ScryfallAPI
-
-
-GOOD_RESPONSE = {'object': 'card', 'id': '6b3a20ac-1860-4513-bb73-35d23b088b04', 'name': 'Mox Opal',
-                 'oracle_id': 'de2440de-e948-4811-903c-0bbe376ff64d', 'multiverse_ids': [397719],
-                 # lots more of info in json
-                 'mtgo_id': 57258, 'prices': {'usd': '91.40', 'usd_foil': '111.66', 'eur': '69.87', 'tix': '30.29'}}
+from collection_app.tests import constants
 
 
 @pytest.fixture
 def mock_external_api():
     card_api_instance = MagicMock(spec=ScryfallAPI)
     card_api_instance.get_card_values.return_value = dict(
-        {'foil': GOOD_RESPONSE['prices']['usd_foil'],
-         'non-foil': GOOD_RESPONSE['prices']['usd']})
+        {'foil': constants.GOOD_RESPONSE['prices']['usd_foil'],
+         'non-foil': constants.GOOD_RESPONSE['prices']['usd']})
     return card_api_instance
 
 

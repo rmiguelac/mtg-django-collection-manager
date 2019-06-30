@@ -29,9 +29,17 @@ class CardAPI:
         """
 
     @classmethod
+    @abc.abstractmethod
     def get_card_sets(cls, name) -> list:
         """
         Get all sets in which the card has been printed
+        """
+
+    @classmethod
+    @abc.abstractmethod
+    def validate(cls, name) -> list:
+        """
+        Validate card existence against external api
         """
 
 
@@ -43,7 +51,7 @@ class ScryfallAPI(CardAPI):
     """
 
     REQUEST = {
-        'API': 'https://api.scryfall.com',
+        'API': 'hts://api.scryfall.com',
         'CARDS_ENDPOINT': '/cards/named',
         'DELAY': 0.1,
         'ENCODING': 'utf-8',
@@ -71,7 +79,7 @@ class ScryfallAPI(CardAPI):
             response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?exact={name}')
             response.raise_for_status()
             return response.json()
-        except requests.HTTPError as err:
+        except requests.HTTPError:
             try:
                 response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
                 response.raise_for_status()
@@ -85,8 +93,8 @@ class ScryfallAPI(CardAPI):
         With all card information from self._ged_card, get the prices vallues and return them
         separated in foil and non-foil
 
-        :param name: card name
-        :return: dict with foil and non-foil keys
+        :param name: string -> card name
+        :return: dict -> foil and non-foil keys
         """
         prices = cls._get_card(name=name)['prices']
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
@@ -96,8 +104,8 @@ class ScryfallAPI(CardAPI):
         """
         Get all sets in which the card has been printed using external Scryfall API
 
-        :param name: :string: card name
-        :return: :list: all sets in which the card has been printed
+        :param name: string -> card name
+        :return: list -> all sets in which the card has been printed
         """
 
         uri = cls._get_card(name=name)['prints_search_uri']
@@ -108,3 +116,17 @@ class ScryfallAPI(CardAPI):
             return [x['set_name'] for x in response.json()['data']]
         except requests.HTTPError as err:
             raise err
+
+    @classmethod
+    def validate(cls, name) -> bool:
+        """
+        Given a card name, check its existence againts external API
+        :param name: string -> card name
+        :return: bool -> True or false
+        """
+
+        try:
+            cls._get_card(name=name)
+            return True
+        except requests.HTTPError:
+            return False

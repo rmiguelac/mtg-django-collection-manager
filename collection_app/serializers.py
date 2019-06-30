@@ -21,9 +21,9 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         """
 
         card = CardScryfallImpl(name=data['name'])
-        if card:
-            if card.is_valid and data['expansion'] in card.sets:
-                return data
+        if card.is_valid and data['expansion'] in card.sets:
+            data['value'] = card.value
+            return data
         raise serializers.ValidationError(
             'There is no such card {card} in {exp} set'.format(card=data['name'], exp=data['expansion'])
         )
@@ -32,16 +32,6 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         """
         Create and return new 'Card' instance, given the validated data
         """
-        args = {
-            'name': validated_data['name'],
-            'expansion': validated_data['expansion'],
-            'condition': validated_data['condition'],
-            'foil': validated_data['foil'],
-        }
-
-        card = CardScryfallImpl(**args)
-        validated_data['value'] = card.value
-
         return Card.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
