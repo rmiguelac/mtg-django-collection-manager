@@ -1,10 +1,7 @@
-import logging
 import abc
+from functools import lru_cache
 
 import requests
-
-
-logger = logging.getLogger(__name__)
 
 
 class CardAPI:
@@ -17,7 +14,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def _get_card(cls, name):
+    def _get_card(cls, name) -> dict:
         """
         Get all card information into a class object
         This class object should then be read and/or returned when requested.
@@ -25,14 +22,33 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_values(cls, name):
+    def get_card_values(cls, name) -> dict:
         """
         Get card value information
         This class object should then be read and/or returned when requested.
         """
 
+    @classmethod
+    @abc.abstractmethod
+    def get_card_sets(cls, name) -> list:
+        """
+        Get all sets in which the card has been printed
+        """
+
+    @classmethod
+    @abc.abstractmethod
+    def validate(cls, name) -> list:
+        """
+        Validate card existence against external api
+        """
+
 
 class ScryfallAPI(CardAPI):
+
+    """
+    Implementation of abstract CardAPI class using ScryfallAPI external API
+    Several limitation on the request must be followed. Delay for example.
+    """
 
     REQUEST = {
         'API': 'https://api.scryfall.com',
@@ -47,6 +63,7 @@ class ScryfallAPI(CardAPI):
         super().__init__()
 
     @classmethod
+    @lru_cache(maxsize=10000)
     def _get_card(cls, name) -> dict:
         """
         Using external HTTPS API, get card information
@@ -62,18 +79,54 @@ class ScryfallAPI(CardAPI):
             response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?exact={name}')
             response.raise_for_status()
             return response.json()
-        except requests.HTTPError as err:
-            logger.debug(f'Card "{name}" not found. trying fuzzy match. Response: {err}')
+        except requests.HTTPError:
             try:
                 response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
                 response.raise_for_status()
                 return response.json()
             except requests.HTTPError as err:
-                logger.debug(f'Card "{name}" not found. Response: {err}')
-                raise ValueError
+                raise err
 
     @classmethod
-    def get_card_values(cls, name):
+    def get_card_values(cls, name) -> dict:
+        """
+        With all card information from self._ged_card, get the prices vallues and return them
+        separated in foil and non-foil
+
+        :param name: string -> card name
+        :return: dict -> foil and non-foil keys
+        """
         prices = cls._get_card(name=name)['prices']
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
 
+    @classmethod
+    def get_card_sets(cls, name) -> list:
+        """
+        Get all sets in which the card has been printed using external Scryfall API
+
+        :param name: string -> card name
+        :return: list -> all sets in which the card has been printed
+        """
+
+        uri = cls._get_card(name=name)['prints_search_uri']
+
+        try:
+            response = requests.get(url=uri)
+            response.raise_for_status()
+            return [x['set_name'] for x in response.json()['data']]
+        except requests.HTTPError as err:
+            raise err
+
+    @classmethod
+    def validate(cls, name) -> bool:
+        """
+        Given a card name, check its existence againts external API
+        :param name: string -> card name
+        :return: bool -> True or false
+        """
+
+        try:
+            cls._get_card(name=name)
+            return True
+        except requests.HTTPError:
+            return False
