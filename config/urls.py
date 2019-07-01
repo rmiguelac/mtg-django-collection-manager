@@ -7,7 +7,7 @@ from collection_app import views
 
 
 router = routers.DefaultRouter()
-router.register(r'cards', views.CardViewSet)
+router.register(r'api/cards', views.CardViewSet)
 
 
 urlpatterns = [

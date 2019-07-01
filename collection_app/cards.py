@@ -54,6 +54,10 @@ class Card:
 
     @value.getter
     def value(self) -> float:
+        """
+        Using external API, get card values
+        :return: float -> card value
+        """
         price = self._card_api.get_card_values(name=self.name)
 
         if self.foil:

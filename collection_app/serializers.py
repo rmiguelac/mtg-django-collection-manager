@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from collection_app.models import Card
 from collection_app.cards import CardScryfallImpl

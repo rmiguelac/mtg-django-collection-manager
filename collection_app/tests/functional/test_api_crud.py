@@ -1,8 +1,4 @@
 from unittest.mock import patch
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 from django.contrib.auth.models import User
 import pytest
