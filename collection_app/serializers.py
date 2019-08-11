@@ -7,17 +7,21 @@ from collection_app.cards import CardScryfallImpl
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 
+    cards = serializers.PrimaryKeyRelatedField(many=True, queryset=Card.objects.all())
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'cards']
 
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
 
+    owner = serializers.ReadOnlyField(source='owner.username')
+
     class Meta:
         model = Card
         fields = '__all__'
-        read_only_fields = ('value',)
+        read_only_fields = ('value', 'owner')
 
     def validate(self, data):
         """

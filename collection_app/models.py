@@ -3,6 +3,7 @@ from django.db import models
 
 class Card(models.Model):
 
+    owner = models.ForeignKey('auth.User', related_name='cards', on_delete=models.CASCADE)
     name = models.CharField('Card Name', max_length=128, db_index=True)
     expansion = models.CharField('Expansion', max_length=64, blank=True)
     condition = models.CharField('Condition', max_length=2, blank=True)
