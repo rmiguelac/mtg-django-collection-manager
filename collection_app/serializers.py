@@ -1,7 +1,15 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from collection_app.models import Card
 from collection_app.cards import CardScryfallImpl
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
 
 
 class CardSerializer(serializers.HyperlinkedModelSerializer):
