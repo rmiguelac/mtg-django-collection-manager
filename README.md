@@ -88,6 +88,7 @@ ALTER USER myuser CREATEDB;
 ```commandline
 ./manage.py makemigrations
 ./manage.py migrate
+./manage.py createsuperuser
 ./manage.py runserver
 ```
 
