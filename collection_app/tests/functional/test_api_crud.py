@@ -87,8 +87,8 @@ class TestCollection(APITestCase):
                 payload = constants.GOOD_PAYLOAD.copy()
                 self.client.post(create_url, payload, format='json')
                 update_payload = constants.GOOD_PAYLOAD.copy()
-                update_payload['quantity'] = 3
-        with patch('collection_app.cards_api.ScryfallAPI._get_card', side_effect=HTTPError):
+                update_payload['name'] = 'Mx Pl'
+        with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.BAD_RESPONSE):
             with patch('collection_app.cards_api.ScryfallAPI.validate', return_value=False):
                 card_id = self.client.get(path='/api/cards/').data[0]['url'][-2:]
                 update_response = self.client.put(f'/api/cards/{card_id}', update_payload, format='json')
