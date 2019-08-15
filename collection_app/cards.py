@@ -61,10 +61,10 @@ class Card:
         price = self._card_api.get_card_values(name=self.name)
 
         if self.foil:
-            self.value = price['foil']
+            self.value = price['foil'] if price['foil'] else 0.00
             return float(self._value)
         else:
-            self.value = price['non-foil']
+            self.value = price['non-foil'] if price['non-foil'] else 0.00
             return float(self._value)
 
     @value.setter
