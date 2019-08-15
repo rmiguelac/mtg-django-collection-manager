@@ -52,7 +52,7 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         Update and return existing 'Card' class
         """
         instance.name = validated_data.get('name', instance.name)
-        instance.expansion = validated_data.get('set', instance.expansion)
+        instance.expansion = validated_data.get('expansion', instance.expansion)
         instance.condition = validated_data.get('condition', instance.condition)
         instance.foil = validated_data.get('foil', instance.foil)
         instance.quantity = validated_data.get('quantity', instance.quantity)
