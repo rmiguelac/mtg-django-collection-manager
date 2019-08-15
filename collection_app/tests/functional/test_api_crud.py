@@ -81,7 +81,19 @@ class TestCollection(APITestCase):
 
     @pytest.mark.django_db
     def test_update_invalid_card(self):
-        pass
+        with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
+            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
+                create_url = reverse('card-list')
+                payload = constants.GOOD_PAYLOAD.copy()
+                self.client.post(create_url, payload, format='json')
+                update_payload = constants.GOOD_PAYLOAD.copy()
+                update_payload['quantity'] = 3
+        with patch('collection_app.cards_api.ScryfallAPI._get_card', side_effect=HTTPError):
+            with patch('collection_app.cards_api.ScryfallAPI.validate', return_value=False):
+                card_id = self.client.get(path='/api/cards/').data[0]['url'][-2:]
+                update_response = self.client.put(f'/api/cards/{card_id}', update_payload, format='json')
+
+        self.assertEqual(update_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     #@pytest.mark.django_db
     #def test_update_to_invalid_expansion_card(self, factory):
