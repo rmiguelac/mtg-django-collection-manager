@@ -26,7 +26,6 @@ class Card:
     def sets(self) -> list:
         """
         Sets/Expansions in which the card have been printed
-        :return: list with all given sets in english
         """
 
         return self.sets
@@ -45,8 +44,6 @@ class Card:
     def value(self) -> float:
         """
         Card value in USD
-
-        :return: return float object which represents the card price
         """
         return self.value
 
@@ -54,7 +51,6 @@ class Card:
     def value(self) -> float:
         """
         Using external API, get card values
-        :return: float -> card value
         """
         price = self._card_api.get_card_values(name=self.name)
 
@@ -73,8 +69,6 @@ class Card:
     def is_valid(self) -> bool:
         """
         Check card existence against external API
-
-        :return: True if able to find it in external API, False otherwise
         """
         return self.is_valid
 
@@ -82,7 +76,6 @@ class Card:
     def is_valid(self) -> bool:
         """
         Validate card existence given its name using external API
-        :return: bool -> either True or False
         """
 
         self.is_valid = self._card_api.validate(name=self.name)

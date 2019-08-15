@@ -19,7 +19,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def _get_card(cls, name) -> dict:
+    def _get_card(cls, name: str) -> dict:
         """
         Get all card information into a class object
         This class object should then be read and/or returned when requested.
@@ -27,7 +27,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_values(cls, name) -> dict:
+    def get_card_values(cls, name: str) -> dict:
         """
         Get card value information
         This class object should then be read and/or returned when requested.
@@ -35,14 +35,14 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_sets(cls, name) -> list:
+    def get_card_sets(cls, name: str) -> list:
         """
         Get all sets in which the card has been printed
         """
 
     @classmethod
     @abc.abstractmethod
-    def validate(cls, name) -> list:
+    def validate(cls, name: str) -> list:
         """
         Validate card existence against external api
         """
@@ -69,15 +69,12 @@ class ScryfallAPI(CardAPI):
 
     @classmethod
     @lru_cache(maxsize=10000)
-    def _get_card(cls, name) -> dict:
+    def _get_card(cls, name: str) -> dict:
         """
         Using external HTTPS API, get card information
 
         While the first try attempts to get card info uses the /exact endpoint and is more exact,
         the fuzzy method might help when providing miss-spelled cards.
-
-        :param name: card name
-        :return: json with extracted information
         """
 
         try:
@@ -95,13 +92,10 @@ class ScryfallAPI(CardAPI):
                 raise err
 
     @classmethod
-    def get_card_values(cls, name) -> dict:
+    def get_card_values(cls, name: str) -> dict:
         """
         With all card information from self._ged_card, get the prices vallues and return them
         separated in foil and non-foil
-
-        :param name: string -> card name
-        :return: dict -> foil and non-foil keys
         """
         logger.info('Getting card values')
         prices = cls._get_card(name=name)['prices']
@@ -109,12 +103,9 @@ class ScryfallAPI(CardAPI):
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
 
     @classmethod
-    def get_card_sets(cls, name) -> list:
+    def get_card_sets(cls, name: str) -> list:
         """
         Get all sets in which the card has been printed using external Scryfall API
-
-        :param name: string -> card name
-        :return: list -> all sets in which the card has been printed
         """
 
         uri = cls._get_card(name=name)['prints_search_uri']
@@ -128,11 +119,9 @@ class ScryfallAPI(CardAPI):
             raise err
 
     @classmethod
-    def validate(cls, name) -> bool:
+    def validate(cls, name: str) -> bool:
         """
         Given a card name, check its existence againts external API
-        :param name: string -> card name
-        :return: bool -> True or false
         """
 
         try:

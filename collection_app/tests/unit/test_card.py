@@ -27,6 +27,11 @@ class TestCard:
             card = CardScryfallImpl(name='Mox Opal')
             assert isinstance(card.value, float)
 
+    def test_card_value_is_null(self):
+        with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.NULL_PRICE_RESPONSE):
+            card = CardScryfallImpl(name='Mox Opal')
+            assert card.value == 0.00
+
     def test_card_foil_value(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
             card = CardScryfallImpl(name='Mox Opal', foil=True)
