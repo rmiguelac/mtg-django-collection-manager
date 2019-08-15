@@ -1,7 +1,12 @@
 import abc
 from functools import lru_cache
+import logging
 
 import requests
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class CardAPI:
@@ -76,11 +81,13 @@ class ScryfallAPI(CardAPI):
         """
 
         try:
+            logger.info(f'About to request for {name} card')
             response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?exact={name}')
             response.raise_for_status()
             return response.json()
         except requests.HTTPError:
             try:
+                logger.info(f'Unable to locate exactly {name} named card, looking into fuzzy naming...')
                 response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
                 response.raise_for_status()
                 return response.json()
@@ -96,7 +103,9 @@ class ScryfallAPI(CardAPI):
         :param name: string -> card name
         :return: dict -> foil and non-foil keys
         """
+        logger.info('Getting card values')
         prices = cls._get_card(name=name)['prices']
+        logger.debug(f'Card values are {prices}')
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
 
     @classmethod
@@ -111,6 +120,7 @@ class ScryfallAPI(CardAPI):
         uri = cls._get_card(name=name)['prints_search_uri']
 
         try:
+            logger.info(f'Fetching sets in which {name} was printed...')
             response = requests.get(url=uri)
             response.raise_for_status()
             return [x['set_name'] for x in response.json()['data']]
@@ -126,6 +136,7 @@ class ScryfallAPI(CardAPI):
         """
 
         try:
+            logger.info(f'Validating card {name} existence against external API...')
             cls._get_card(name=name)
             return True
         except requests.HTTPError:
