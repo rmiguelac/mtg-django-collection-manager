@@ -27,7 +27,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_values(cls, name: str) -> Dict:
+    def get_card_value(cls, name: str, expansion: str) -> Dict:
         """
         Get card value information
         This class object should then be read and/or returned when requested.
@@ -91,29 +91,36 @@ class ScryfallAPI(CardAPI):
                 raise err
 
     @classmethod
-    def get_card_values(cls, name: str) -> Dict:
+    def get_card_value(cls, name: str, expansion: str) -> Dict:
         """
-        With all card information from self._ged_card, get the prices vallues and return them
+        With all card information from self._get_card, get the values and return them
         separated in foil and non-foil
         """
         logger.info('Getting card values')
-        prices = cls._get_card(name=name)['prices']
+        prices = cls.get_card_sets(name=name)
         logger.debug(f'Card values are {prices}')
-        return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
+        return dict({
+            'foil': prices[expansion]['usd_foil'],
+            'non-foil': prices[expansion]['usd'],
+        })
 
     @classmethod
-    def get_card_sets(cls, name: str) -> List:
+    def get_card_sets(cls, name: str) -> Dict:
         """
         Get all sets in which the card has been printed using external Scryfall API
         """
 
         uri = cls._get_card(name=name)['prints_search_uri']
+        sets = {}
 
         try:
             logger.info(f'Fetching sets in which {name} was printed...')
             response = requests.get(url=uri)
             response.raise_for_status()
-            return [x['set_name'] for x in response.json()['data']]
+            for item in response.json()['data']:
+                sets[item['set_name']] = item['prices']
+            logger.debug(f'Fetched {sets} information on {name}')
+            return sets
         except requests.HTTPError as err:
             logger.error(err)
             raise err

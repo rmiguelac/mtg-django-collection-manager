@@ -52,7 +52,7 @@ class Card:
         """
         Using external API, get card values
         """
-        price = self._card_api.get_card_values(name=self.name)
+        price = self._card_api.get_card_value(name=self.name, expansion=self.expansion)
 
         if self.foil:
             self.value = price['foil'] if price['foil'] else 0.00
