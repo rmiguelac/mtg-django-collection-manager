@@ -6,7 +6,6 @@ from typing import List, Dict
 import requests
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class CardAPI:

@@ -154,3 +154,21 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': os.getenv('DJANGO_LOG_CONSOLE_LEVEL') or 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LOGGER_LEVEL') or 'INFO',
+            'propagate': True,
+        },
+    },
+}
