@@ -1,3 +1,5 @@
+from typing import Dict
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -23,22 +25,19 @@ class CardSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         read_only_fields = ('value', 'owner')
 
-    def validate(self, data):
+    def validate(self, data: dict) -> Dict:
         """
         Custom validator on whole request data
         If data is not valid against external API, return exception
-
-        :param data: dict with whole Card model fields
-        :return: value
         """
 
-        card = CardScryfallImpl(name=data['name'])
+        card = CardScryfallImpl(name=data['name'], expansion=data['expansion'])
 
-        if card.is_valid and data['expansion'] in card.sets:
+        if card.is_valid:
             data['value'] = card.value
             return data
         raise serializers.ValidationError(
-            'There is no such card {card} in {exp} set'.format(card=data['name'], exp=data['expansion'])
+            f'There is no such combination of {data["name"]} card in {data["expansion"]} set'
         )
 
     def create(self, validated_data):

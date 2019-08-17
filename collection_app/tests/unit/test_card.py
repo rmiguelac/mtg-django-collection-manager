@@ -14,7 +14,7 @@ class TestCard:
 
     def test_card_is_valid(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
-            card = CardScryfallImpl(name='Mox Opal')
+            card = CardScryfallImpl(name='Mox Opal', expansion='Scars of Mirrodin')
             assert card.is_valid is True
 
     def test_card_is_invalid(self):

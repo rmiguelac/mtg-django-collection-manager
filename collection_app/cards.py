@@ -31,7 +31,7 @@ class Card:
         return self.sets
 
     @sets.setter
-    def sets(self, new_value) -> None:
+    def sets(self, new_value: list) -> None:
         self._sets = new_value
 
     @sets.getter
@@ -78,7 +78,7 @@ class Card:
         Validate card existence given its name using external API
         """
 
-        self.is_valid = self._card_api.validate(name=self.name)
+        self.is_valid = self._card_api.validate(name=self.name, expansion=self.expansion)
         return self._is_valid
 
     @is_valid.setter

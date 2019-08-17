@@ -1,9 +1,9 @@
 import abc
 from functools import lru_cache
 import logging
+from typing import List, Dict
 
 import requests
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -19,7 +19,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def _get_card(cls, name: str) -> dict:
+    def _get_card(cls, name: str) -> Dict:
         """
         Get all card information into a class object
         This class object should then be read and/or returned when requested.
@@ -27,7 +27,7 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_values(cls, name: str) -> dict:
+    def get_card_values(cls, name: str) -> Dict:
         """
         Get card value information
         This class object should then be read and/or returned when requested.
@@ -35,21 +35,20 @@ class CardAPI:
 
     @classmethod
     @abc.abstractmethod
-    def get_card_sets(cls, name: str) -> list:
+    def get_card_sets(cls, name: str) -> List:
         """
         Get all sets in which the card has been printed
         """
 
     @classmethod
     @abc.abstractmethod
-    def validate(cls, name: str) -> list:
+    def validate(cls, name: str, expansion: str) -> List:
         """
         Validate card existence against external api
         """
 
 
 class ScryfallAPI(CardAPI):
-
     """
     Implementation of abstract CardAPI class using ScryfallAPI external API
     Several limitation on the request must be followed. Delay for example.
@@ -69,7 +68,7 @@ class ScryfallAPI(CardAPI):
 
     @classmethod
     @lru_cache(maxsize=10000)
-    def _get_card(cls, name: str) -> dict:
+    def _get_card(cls, name: str) -> Dict:
         """
         Using external HTTPS API, get card information
 
@@ -92,7 +91,7 @@ class ScryfallAPI(CardAPI):
                 raise err
 
     @classmethod
-    def get_card_values(cls, name: str) -> dict:
+    def get_card_values(cls, name: str) -> Dict:
         """
         With all card information from self._ged_card, get the prices vallues and return them
         separated in foil and non-foil
@@ -103,7 +102,7 @@ class ScryfallAPI(CardAPI):
         return dict({'foil': prices['usd_foil'], 'non-foil': prices['usd']})
 
     @classmethod
-    def get_card_sets(cls, name: str) -> list:
+    def get_card_sets(cls, name: str) -> List:
         """
         Get all sets in which the card has been printed using external Scryfall API
         """
@@ -116,10 +115,11 @@ class ScryfallAPI(CardAPI):
             response.raise_for_status()
             return [x['set_name'] for x in response.json()['data']]
         except requests.HTTPError as err:
+            logger.error(err)
             raise err
 
     @classmethod
-    def validate(cls, name: str) -> bool:
+    def validate(cls, name: str, expansion: str) -> bool:
         """
         Given a card name, check its existence againts external API
         """
@@ -127,6 +127,19 @@ class ScryfallAPI(CardAPI):
         try:
             logger.info(f'Validating card {name} existence against external API...')
             cls._get_card(name=name)
-            return True
         except requests.HTTPError:
+            logger.error(f'There is no such card named {name}!')
+            return False
+
+        try:
+            logger.info(f'Validating card {name} existence in expansion set {expansion}')
+            sets = cls.get_card_sets(name=name)
+            if expansion in sets:
+                logger.debug(f'{expansion} found in {sets}')
+                return True
+            else:
+                logger.error(f'{expansion} not found in {sets}')
+                return False
+        except requests.HTTPError:
+            logger.error(f'There is not such card {name} in expansion set {expansion}')
             return False
