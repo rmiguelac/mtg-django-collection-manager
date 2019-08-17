@@ -7,3 +7,4 @@ omit =
   *urls.py
   *wsgi/*
   manage.py
+  config/*
