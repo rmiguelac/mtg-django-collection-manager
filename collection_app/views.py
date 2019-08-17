@@ -24,3 +24,7 @@ class CardViewSet(viewsets.ModelViewSet):
         Override the default perform_create to pass the owner as well
         """
         serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Card.objects.filter(owner=user)
