@@ -16,32 +16,31 @@ class CardAPI:
     """
     __metaclass__ = abc.ABCMeta
 
-    @classmethod
+    def __init__(self):
+        self.card = None
+
     @abc.abstractmethod
-    def _get_card(cls, name: str) -> Dict:
+    def _get_card(self, name: str) -> Dict:
         """
         Get all card information into a class object
         This class object should then be read and/or returned when requested.
         """
 
-    @classmethod
     @abc.abstractmethod
-    def get_card_value(cls, name: str, expansion: str) -> Dict:
+    def get_card_values(self, name: str, expansion: str) -> Dict:
         """
         Get card value information
         This class object should then be read and/or returned when requested.
         """
 
-    @classmethod
     @abc.abstractmethod
-    def get_card_sets(cls, name: str) -> List:
+    def get_card_sets(self, name: str) -> List:
         """
         Get all sets in which the card has been printed
         """
 
-    @classmethod
     @abc.abstractmethod
-    def validate(cls, name: str, expansion: str) -> List:
+    def validate(self, name: str, expansion: str) -> List:
         """
         Validate card existence against external api
         """
@@ -64,10 +63,10 @@ class ScryfallAPI(CardAPI):
 
     def __init__(self):
         super().__init__()
+        self.card = None
 
-    @classmethod
     @lru_cache(maxsize=10000)
-    def _get_card(cls, name: str) -> Dict:
+    def _get_card(self, name: str, method: str = 'exact') -> Dict:
         """
         Using external HTTPS API, get card information
 
@@ -75,71 +74,65 @@ class ScryfallAPI(CardAPI):
         the fuzzy method might help when providing miss-spelled cards.
         """
 
-        try:
-            logger.info(f'About to request for {name} card')
-            response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?exact={name}')
-            response.raise_for_status()
-            return response.json()
-        except requests.HTTPError:
+        if not self.card:
             try:
-                logger.info(f'Unable to locate exactly {name} named card, looking into fuzzy naming...')
-                response = requests.get(url=f'{cls.REQUEST["API"]}{cls.REQUEST["CARDS_ENDPOINT"]}?fuzzy={name}')
-                response.raise_for_status()
-                return response.json()
-            except requests.HTTPError as err:
-                raise err
+                logger.info(f'About to request for {name} card')
+                card = requests.get(url=f'{self.REQUEST["API"]}{self.REQUEST["CARDS_ENDPOINT"]}?{method}={name}')
+                card.raise_for_status()
+                card_info_url = card.json()['prints_search_uri']
+                card_info = requests.get(url=card_info_url)
+                card_info.raise_for_status()
+                self.card = card_info.json()['data']
+                return self.card
+            except requests.HTTPError:
+                try:
+                    logger.info(f'Unable to locate exactly {name} named card, looking into fuzzy naming...')
+                    self._get_card(name=name, method='fuzzy')
+                except requests.HTTPError as err:
+                    raise err
+        else:
+            return self.card
 
-    @classmethod
-    def get_card_value(cls, name: str, expansion: str) -> Dict:
+    def get_card_values(self, name: str, expansion: str) -> Dict:
         """
         With all card information from self._get_card, get the values and return them
         separated in foil and non-foil
         """
-        logger.info('Getting card values')
-        prices = cls.get_card_sets(name=name)
-        logger.debug(f'Card values are {prices}')
-        return dict({
-            'foil': prices[expansion]['usd_foil'],
-            'non-foil': prices[expansion]['usd'],
-        })
 
-    @classmethod
-    def get_card_sets(cls, name: str) -> Dict:
+        prices = {'foil': None, 'non-foil': None}
+
+        logger.info('Getting card values')
+        for set_info in self._get_card(name=name):
+            if set_info['set_name'] == expansion:
+                prices = {
+                    'foil': set_info['prices']['usd_foil'],
+                    'non-foil': set_info['prices']['usd'],
+                }
+                logger.debug(f'Card values are {prices}')
+                return prices
+        return prices
+
+    def get_card_sets(self, name: str) -> List:
         """
         Get all sets in which the card has been printed using external Scryfall API
         """
+        return [expansion['set_name'] for expansion in self._get_card(name=name)]
 
-        uri = cls._get_card(name=name)['prints_search_uri']
-        sets = {}
-
-        try:
-            logger.info(f'Fetching sets in which {name} was printed...')
-            response = requests.get(url=uri)
-            response.raise_for_status()
-            for item in response.json()['data']:
-                sets[item['set_name']] = item['prices']
-            logger.debug(f'Fetched {sets} information on {name}')
-            return sets
-        except requests.HTTPError as err:
-            logger.error(err)
-            raise err
-
-    @classmethod
-    def validate(cls, name: str, expansion: str) -> bool:
+    def validate(self, name: str, expansion: str) -> bool:
         """
         Given a card name, check its existence againts external API
         """
 
         try:
             logger.info(f'Validating card {name} existence against external API...')
-            cls._get_card(name=name)
+            self._get_card(name=name)
         except requests.HTTPError:
             logger.error(f'There is no such card named {name}!')
             return False
 
         try:
             logger.info(f'Validating card {name} existence in expansion set {expansion}')
-            sets = cls.get_card_sets(name=name)
+            sets = self.get_card_sets(name=name)
             if expansion in sets:
                 logger.debug(f'{expansion} found in {sets}')
                 return True

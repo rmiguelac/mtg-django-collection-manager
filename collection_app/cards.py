@@ -18,27 +18,8 @@ class Card:
         self.condition = condition
         self.foil = foil
         self._value = None
-        self._sets = None
         self._is_valid = False
-        self._card_api = card_api
-
-    @property
-    def sets(self) -> list:
-        """
-        Sets/Expansions in which the card have been printed
-        """
-
-        return self.sets
-
-    @sets.setter
-    def sets(self, new_value: list) -> None:
-        self._sets = new_value
-
-    @sets.getter
-    def sets(self) -> list:
-        sets = self._card_api.get_card_sets(name=self.name)
-        self.sets = sets
-        return sets
+        self._card_api = card_api()
 
     @property
     def value(self) -> float:
@@ -52,7 +33,7 @@ class Card:
         """
         Using external API, get card values
         """
-        price = self._card_api.get_card_value(name=self.name, expansion=self.expansion)
+        price = self._card_api.get_card_values(name=self.name, expansion=self.expansion)
 
         if self.foil:
             self.value = price['foil'] if price['foil'] else 0.00

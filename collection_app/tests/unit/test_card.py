@@ -9,7 +9,7 @@ from collection_app.tests import constants
 class TestCard:
 
     def test_card_instantiation(self):
-        card = CardScryfallImpl(name='Mox Opal')
+        card = CardScryfallImpl(name='Mox Opal', expansion='Scars of Mirrodin')
         assert isinstance(card, CardScryfallImpl)
 
     def test_card_is_valid(self):
@@ -29,7 +29,7 @@ class TestCard:
 
     def test_card_value_is_null(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
-            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.NULL_PRICE_RESPONSE):
+            with patch('collection_app.cards_api.ScryfallAPI.get_card_values', return_value=constants.NULL_PRICE_RESPONSE):
                 card = CardScryfallImpl(name='Mox Opal', expansion='Scars of Mirrodin')
                 assert card.value == 0.00
 
@@ -43,14 +43,14 @@ class TestCard:
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
             with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
                 card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Scars of Mirrodin')
-                assert card.value == 96.37
+                assert card.value == 97.78
 
     def test_card_value_by_set(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
             with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
                 card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Scars of Mirrodin')
-                assert card.value == 96.37
+                assert card.value == 97.78
                 card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Modern Masters 2015')
-                assert card.value == 97.98
+                assert card.value == 99.31
                 card = CardScryfallImpl(name='Mox Opal', foil=True, expansion='Kaladesh Inventions')
-                assert card.value == 302.34
+                assert card.value == 302.69
