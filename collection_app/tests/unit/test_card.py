@@ -35,22 +35,19 @@ class TestCard:
 
     def test_card_foil_value(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
-            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
-                card = CardScryfallImpl(name='Mox Opal', foil=True, expansion='Scars of Mirrodin')
-                assert card.value == 196.98
+            card = CardScryfallImpl(name='Mox Opal', foil=True, expansion='Scars of Mirrodin')
+            assert card.value == 196.98
 
     def test_card_non_foil_value(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
-            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
-                card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Scars of Mirrodin')
-                assert card.value == 97.78
+            card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Scars of Mirrodin')
+            assert card.value == 100.97
 
     def test_card_value_by_set(self):
         with patch('collection_app.cards_api.ScryfallAPI._get_card', return_value=constants.GOOD_RESPONSE):
-            with patch('collection_app.cards_api.ScryfallAPI.get_card_sets', return_value=constants.GOOD_RESPONSE_SETS):
-                card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Scars of Mirrodin')
-                assert card.value == 97.78
-                card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Modern Masters 2015')
-                assert card.value == 99.31
-                card = CardScryfallImpl(name='Mox Opal', foil=True, expansion='Kaladesh Inventions')
-                assert card.value == 302.69
+            card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Scars of Mirrodin')
+            assert card.value == 100.97
+            card = CardScryfallImpl(name='Mox Opal', foil=False, expansion='Modern Masters 2015')
+            assert card.value == 104.5
+            card = CardScryfallImpl(name='Mox Opal', foil=True, expansion='Kaladesh Inventions')
+            assert card.value == 293.27

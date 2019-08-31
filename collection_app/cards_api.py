@@ -2,6 +2,7 @@ import abc
 from functools import lru_cache
 import logging
 from typing import List, Dict
+from time import sleep
 
 import requests
 
@@ -75,6 +76,7 @@ class ScryfallAPI(CardAPI):
         """
 
         if not self.card:
+            sleep(self.REQUEST['DELAY'])
             try:
                 logger.info(f'About to request for {name} card')
                 card = requests.get(url=f'{self.REQUEST["API"]}{self.REQUEST["CARDS_ENDPOINT"]}?{method}={name}')
@@ -116,7 +118,8 @@ class ScryfallAPI(CardAPI):
         """
         Get all sets in which the card has been printed using external Scryfall API
         """
-        return [expansion['set_name'] for expansion in self._get_card(name=name)]
+        card = self._get_card(name=name)
+        return [expansion['set_name'] for expansion in card]
 
     def validate(self, name: str, expansion: str) -> bool:
         """
