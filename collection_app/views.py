@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
-from django_filters import CharFilter
 from django_filters.rest_framework import FilterSet, NumberFilter
 from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from collection_app.cards import CardScryfallImpl
 from collection_app.models import Card
 from collection_app.serializers import CardSerializer, UserSerializer
 
@@ -46,3 +48,16 @@ class CardViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Card.objects.filter(owner=self.request.user)
+
+
+class UpdateCollectionView(APIView):
+
+    def get(self, request):
+        cards = Card.objects.filter(owner=request.user)
+        for card in cards:
+            tmp_card = CardScryfallImpl(name=card.name, expansion=card.expansion, foil=card.foil)
+            tmp_card_value = tmp_card.value
+            card.value = tmp_card_value
+            card.save()
+
+        return Response('Card values are updated')
