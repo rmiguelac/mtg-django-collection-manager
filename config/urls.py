@@ -10,12 +10,12 @@ from collection_app import views
 router = routers.DefaultRouter()
 router.register(r'cards', views.CardViewSet)
 router.register(r'users', views.UserViewSet)
+router.register(r're-evalute', views.UpdateCollectionView, base_name='re-evaluate')
 
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/api/')),
     path('api/', include(router.urls)),
-    path('api/update-collection/', views.UpdateCollectionView.as_view()),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
 ]

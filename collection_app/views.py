@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django_filters.rest_framework import FilterSet, NumberFilter
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from collection_app.cards import CardScryfallImpl
@@ -50,9 +51,9 @@ class CardViewSet(viewsets.ModelViewSet):
         return Card.objects.filter(owner=self.request.user)
 
 
-class UpdateCollectionView(APIView):
+class UpdateCollectionView(viewsets.ViewSet):
 
-    def get(self, request):
+    def list(self, request, format=None):
         cards = Card.objects.filter(owner=request.user)
         for card in cards:
             tmp_card = CardScryfallImpl(name=card.name, expansion=card.expansion, foil=card.foil)
@@ -60,4 +61,4 @@ class UpdateCollectionView(APIView):
             card.value = tmp_card_value
             card.save()
 
-        return Response('Card values are updated')
+        return Response('Collection value updated')
