@@ -2,9 +2,10 @@ import abc
 from functools import lru_cache
 import logging
 from typing import List, Dict
-from time import sleep
 
 import requests
+
+from collection_app.tasks import make_request as request
 
 logger = logging.getLogger(__name__)
 
@@ -76,19 +77,18 @@ class ScryfallAPI(CardAPI):
         """
 
         if not self.card:
-            sleep(self.REQUEST['DELAY'])
             try:
                 logger.info(f'About to request for {name} card')
-                card = requests.get(url=f'{self.REQUEST["API"]}{self.REQUEST["CARDS_ENDPOINT"]}?{method}={name}')
-                card.raise_for_status()
-                card_info_url = card.json()['prints_search_uri']
-                card_info = requests.get(url=card_info_url)
-                card_info.raise_for_status()
-                self.card = card_info.json()['data']
+                async_result = request.delay(url=f'{self.REQUEST["API"]}{self.REQUEST["CARDS_ENDPOINT"]}?{method}={name}')
+                card = async_result.get()
+                card_info_url = card['prints_search_uri']
+                async_result = request.delay(url=card_info_url)
+                card_info = async_result.get()
+                self.card = card_info['data']
                 return self.card
             except requests.HTTPError:
                 try:
-                    logger.info(f'Unable to locate exactly {name} named card, looking into fuzzy naming...')
+                    logger.info(f'Unable to locate card exactly named {name}, looking into fuzzy naming...')
                     self._get_card(name=name, method='fuzzy')
                 except requests.HTTPError as err:
                     raise err

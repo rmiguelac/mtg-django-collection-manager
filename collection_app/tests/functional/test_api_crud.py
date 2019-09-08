@@ -96,10 +96,9 @@ class TestCollection(APITestCase):
         """
         For each card that there is in the DB, get its id and perform an update against the API
         """
-        url = reverse('update-collection')
-        collection_value_pre_update = Card.objects.aggregate(Sum(('value')))
-        self.client.get(url)
-        collection_value_post_update = Card.objects.aggregate(Sum('value'))
+        collection_value_pre_update = Card.objects.all().aggregate(Sum(('value')))
+        self.client.get('/api/re-evaluate/')
+        collection_value_post_update = Card.objects.all().aggregate(Sum('value'))
         self.assertNotEqual(collection_value_pre_update, collection_value_post_update)
 
     #@pytest.mark.django_db
