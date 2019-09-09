@@ -5,7 +5,7 @@ from typing import List, Dict
 
 import requests
 
-from collection_app.tasks import make_request as request
+from collection_app.tasks import make_request
 
 logger = logging.getLogger(__name__)
 
@@ -79,10 +79,10 @@ class ScryfallAPI(CardAPI):
         if not self.card:
             try:
                 logger.info(f'About to request for {name} card')
-                async_result = request.delay(url=f'{self.REQUEST["API"]}{self.REQUEST["CARDS_ENDPOINT"]}?{method}={name}')
+                async_result = make_request.delay(url=f'{self.REQUEST["API"]}{self.REQUEST["CARDS_ENDPOINT"]}?{method}={name}')
                 card = async_result.get()
                 card_info_url = card['prints_search_uri']
-                async_result = request.delay(url=card_info_url)
+                async_result = make_request.delay(url=card_info_url)
                 card_info = async_result.get()
                 self.card = card_info['data']
                 return self.card

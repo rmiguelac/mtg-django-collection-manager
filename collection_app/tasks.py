@@ -4,13 +4,8 @@ from celery.result import AsyncResult
 
 from collection_app.request_manager import RequestManager
 
-app = Celery(
-    namespace='tasks',
-    backend='rpc://',
-    broker='pyamqp://guest@localhost//',
-)
-
-app.config_from_object('collection_app.celeryconfig')
+app = Celery()
+app.config_from_object('celeryconfig')
 
 
 @app.task

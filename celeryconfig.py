@@ -3,5 +3,5 @@ result_backend = 'rpc://'
 
 task_serializer = 'json'
 task_annotations = {
-    'tasks.make_request': {'rate_limit': '1/m'}
+    'collection_app.tasks.make_request': {'rate_limit': '10/s'}
 }
