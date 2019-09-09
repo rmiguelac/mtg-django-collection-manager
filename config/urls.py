@@ -10,7 +10,7 @@ from collection_app import views
 router = routers.DefaultRouter()
 router.register(r'cards', views.CardViewSet)
 router.register(r'users', views.UserViewSet)
-router.register(r're-evalute', views.UpdateCollectionView, base_name='re-evaluate')
+router.register(r're-evalute', views.UpdateCollectionView, basename='re-evaluate')
 
 
 urlpatterns = [

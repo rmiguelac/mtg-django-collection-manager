@@ -52,6 +52,11 @@ class CardViewSet(viewsets.ModelViewSet):
 
 
 class UpdateCollectionView(viewsets.ViewSet):
+    """
+    View to update logged user collection value, card by card
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, format=None):
         cards = Card.objects.filter(owner=request.user)
