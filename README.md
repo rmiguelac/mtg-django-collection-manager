@@ -83,6 +83,23 @@ To do it, also execute the following with psql
 ALTER USER myuser CREATEDB;
 ```
 
+
+### --- RabbitMQ setup
+As we're using celery as a queue manager (to avoid too much requests on external APIs)
+
+there is a need to run a result backend which in this case is the rabbitMQ
+
+```commandline
+docker run -d -p 5672:5672 --name rabbitmq rabbitmq:3
+```
+
+### --- Worker setup
+To run the celery worker, do the following
+
+```commandline
+celery -A collection_app.tasks worker --concurrency=1 --loglevel=info
+```
+
 ### --- Running the application
 
 ```commandline
