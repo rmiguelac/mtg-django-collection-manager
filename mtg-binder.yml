@@ -1,0 +1,52 @@
+version: "3"
+services:
+  jenkins:
+    image: jenkins/jenkins:2.194
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins:/var/jenkins_home
+
+  sonar:
+    image: sonarqube:7.9-community
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar_conf:/opt/sonarqube/conf
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+      - sonar_extensions:/opt/sonarqube/extensions
+
+  rabbitmq:
+    image: rabbitmq:3
+    ports:
+      - "5672:5672"
+
+  nexus:
+    image: sonatype/nexus3:3.0.0
+    ports:
+     - "8081:8081"
+     - "8082:8082"
+     - "8083:8083"
+    volumes:
+     - nexus:/nexus-data
+
+  postgres:
+    image: postgres:9.6
+    env_file:
+      - postgresql.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./create-db.sql:/docker-entrypoint-initdb.d/create-db.sql
+
+volumes:
+  jenkins:
+  sonar_conf:
+  sonar_data:
+  sonar_logs:
+  sonar_extensions:
+  postgres:
+  nexus:
