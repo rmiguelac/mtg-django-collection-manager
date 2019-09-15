@@ -17,9 +17,11 @@ git clone git@github.com:rmiguelac/mtg-django-collection-manager.git
 ```
 
 2 - Setup a virtual environment - make sure the path is python3.6
+If you do not have the libpq-dev lib installed, make sure to install it as psycopg2 will use it
 ```commandline
 mkdir mtg_collection && cd mtg_collection
 virtualenv --python=/usr/bin/python3.6 .
+pip install -r requirements.txt
 ```
 
 3 - put the DJANGO_SECRET in the activate script to always have it when you start the env
