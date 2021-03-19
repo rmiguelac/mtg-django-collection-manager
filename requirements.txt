@@ -10,7 +10,7 @@ chardet==3.0.4
 coverage==4.5.3
 Django==2.2
 django-filter==2.2.0
-djangorestframework==3.9.4
+djangorestframework==3.11.2
 idna==2.8
 importlib-metadata==0.17
 importlib-resources==1.0.2
