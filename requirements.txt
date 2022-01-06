@@ -4,7 +4,7 @@ attrs==19.1.0
 beautifulsoup4==4.7.1
 billiard==3.6.1.0
 bs4==0.0.1
-celery==4.3.0
+celery==5.2.2
 certifi==2019.3.9
 chardet==3.0.4
 coverage==4.5.3
